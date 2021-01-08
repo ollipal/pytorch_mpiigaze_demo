@@ -8,7 +8,7 @@ import cv2
 import numpy as np
 import yacs.config
 
-from ptgaze import (Face, FacePartsName, GazeEstimationMethod, GazeEstimator,
+from saurongaze import (Face, FacePartsName, GazeEstimationMethod, GazeEstimator,
                     Visualizer)
 
 logging.basicConfig(level=logging.INFO)
@@ -224,7 +224,7 @@ class Demo:
                     eye.center, eye.center + length * eye.gaze_vector)
                 pitch, yaw = np.rad2deg(eye.vector_to_angle(eye.gaze_vector))
                 logger.info(
-                    f'[{key.name.lower()}] pitch: {pitch:.2f}, yaw: {yaw:.2f}')
+                    f'[{key.name.lower()}] pitch: {pitch:.2f}, Yaw: {yaw:.2f}')
         elif self.config.mode == GazeEstimationMethod.MPIIFaceGaze.name:
             self.visualizer.draw_3d_line(
                 face.center, face.center + length * face.gaze_vector)

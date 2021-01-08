@@ -6,7 +6,7 @@ import numpy as np
 import torch
 import yacs.config
 
-from ptgaze import (
+from saurongaze import (
     Camera,
     Face,
     FacePartsName,

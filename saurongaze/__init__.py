@@ -1,3 +1,7 @@
+"""saurongaze - accurate gaze and head pose information"""
+
+__version__ = "0.0.1"
+
 from .common import (Camera, Eye, Face, FaceParts, FacePartsName, MODEL3D,
                      Visualizer)
 from .config import get_default_config

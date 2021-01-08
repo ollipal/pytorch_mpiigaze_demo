@@ -1,9 +1,9 @@
 import argparse
 import logging
 
-from ptgaze import get_default_config
-from ptgaze.demo import Demo
-from ptgaze.utils import update_default_config, update_config
+from saurongaze import get_default_config
+from saurongaze.demo import Demo
+from saurongaze.utils import update_default_config, update_config
 
 logger = logging.getLogger(__name__)
 
@@ -45,7 +45,7 @@ def main():
         '--camera',
         type=str,
         help='Camera calibration file. '
-        'See https://github.com/hysts/pytorch_mpiigaze_demo/ptgaze/data/calib/sample_params.yaml'
+        'See https://github.com/hysts/pytorch_mpiigaze_demo/saurongaze/data/calib/sample_params.yaml'
     )
     parser.add_argument(
         '--output-dir',
@@ -67,9 +67,10 @@ def main():
     args = parser.parse_args()
 
     if args.debug:
-        logging.getLogger('ptgaze').setLevel(logging.DEBUG)
+        logging.getLogger('saurongaze').setLevel(logging.DEBUG)
 
     config = get_default_config()
+    print(f"args {args}")
     if args.config:
         config.merge_from_file(args.config)
         if (args.device or args.image or args.video or args.camera

@@ -22,7 +22,7 @@ def _download_dlib_pretrained_model(config: yacs.config.CfgNode) -> None:
         logger.debug('config.facedetector.mode is specified.')
         return
 
-    dlib_model_dir = pathlib.Path('~/.ptgaze/dlib/').expanduser()
+    dlib_model_dir = pathlib.Path('~/.saurongaze/dlib/').expanduser()
     dlib_model_dir.mkdir(exist_ok=True, parents=True)
     dlib_model_path = dlib_model_dir / 'shape_predictor_68_face_landmarks.dat'
     config.face_detector.dlib.model = dlib_model_path.as_posix()
@@ -49,7 +49,7 @@ def _download_dlib_pretrained_model(config: yacs.config.CfgNode) -> None:
 
 def _download_eye_model() -> pathlib.Path:
     logger.debug('Called _download_eye_model()')
-    output_dir = pathlib.Path('~/.ptgaze/models/').expanduser()
+    output_dir = pathlib.Path('~/.saurongaze/models/').expanduser()
     output_dir.mkdir(exist_ok=True, parents=True)
     output_path = output_dir / 'mpiigaze_resnet_preact.pth'
     if not output_path.exists():
@@ -64,7 +64,7 @@ def _download_eye_model() -> pathlib.Path:
 
 def _download_face_model() -> pathlib.Path:
     logger.debug('Called _download_face_model()')
-    output_dir = pathlib.Path('~/.ptgaze/models/').expanduser()
+    output_dir = pathlib.Path('~/.saurongaze/models/').expanduser()
     output_dir.mkdir(exist_ok=True, parents=True)
     output_path = output_dir / 'mpiifacegaze_resnet_simple.pth'
     if not output_path.exists():

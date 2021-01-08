@@ -2,7 +2,7 @@ from typing import Optional
 
 import numpy as np
 
-from ptgaze.common import Eye, FaceParts, FacePartsName
+from saurongaze.common import Eye, FaceParts, FacePartsName
 
 
 class Face(FaceParts):

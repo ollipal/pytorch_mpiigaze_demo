@@ -16,17 +16,17 @@ def _get_requirements(path):
 
 
 setup(
-    name='ptgaze',
+    name='saurongaze',
     version='0.0.1',
-    author='hysts',
-    url='https://github.com/hysts/pytorch_mpiigaze_demo',
+    author='ollipal',
+    url='https://github.com/ollipal/saurongaze',
     python_requires='>=3.7',
     install_requires=_get_requirements('requirements.txt'),
     packages=find_packages(exclude=('tests', )),
     include_package_data=True,
     entry_points={
         'console_scripts': [
-            'ptgaze=ptgaze.main:main',
+            'saurongaze=saurongaze.main:main',
         ],
     },
     description='Gaze estimation using MPIIGaze and MPIIFaceGaze',

@@ -19,14 +19,14 @@ To train a model, use [this repository](https://github.com/hysts/pytorch_mpiigaz
 ### Installation
 
 ```bash
-pip install ptgaze
+pip install saurongaze
 ```
 
 
 ### Run demo
 
 ```bash
-ptgaze --mode eye
+saurongaze --mode eye
 ```
 
 
@@ -34,7 +34,7 @@ ptgaze --mode eye
 
 
 ```
-usage: ptgaze [-h] [--config CONFIG] [--mode {eye,face}]
+usage: saurongaze [-h] [--config CONFIG] [--mode {eye,face}]
               [--face-detector {dlib,face_alignment_dlib,face_alignement_sfd}]
               [--device {cpu,cuda}] [--image IMAGE] [--video VIDEO]
               [--camera CAMERA] [--output-dir OUTPUT_DIR] [--ext {avi,mp4}]
@@ -55,7 +55,7 @@ optional arguments:
   --image IMAGE         Path to an input image file.
   --video VIDEO         Path to an input video file.
   --camera CAMERA       Camera calibration file. See https://github.com/hysts/
-                        pytorch_mpiigaze_demo/ptgaze/data/calib/sample_params.
+                        pytorch_mpiigaze_demo/saurongaze/data/calib/sample_params.
                         yaml
   --output-dir OUTPUT_DIR, -o OUTPUT_DIR
                         If specified, the overlaid video will be saved to this
