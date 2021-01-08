@@ -1,0 +1,12 @@
+[build-system]
+requires = ["flit_core >=2,<4"]
+build-backend = "flit_core.buildapi"
+
+[tool.flit.metadata]
+module = "saurongaze"
+author = "Olli Paloviita"
+author-email = "olli.paloviita@gmail.com"
+home-page = "https://github.com/ollipal/saurongaze"
+classifiers = ["License :: OSI Approved :: MIT License"]
+description-file = "README.md"
+
