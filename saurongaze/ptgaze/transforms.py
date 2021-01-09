@@ -6,7 +6,7 @@ import torch
 import torchvision
 import yacs.config
 
-from saurongaze import GazeEstimationMethod
+from saurongaze.sauron_gaze import GazeEstimationMethod
 
 
 def create_transform(config: yacs.config.CfgNode) -> Any:

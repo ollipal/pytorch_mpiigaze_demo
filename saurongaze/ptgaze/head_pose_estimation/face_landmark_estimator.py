@@ -6,7 +6,7 @@ import face_alignment.detection.sfd
 import numpy as np
 import yacs.config
 
-from saurongaze import Face
+from saurongaze.sauron_gaze import Face
 
 
 class LandmarkEstimator:

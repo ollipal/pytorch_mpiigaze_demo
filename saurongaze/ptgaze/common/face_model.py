@@ -4,7 +4,7 @@ import cv2
 import numpy as np
 from scipy.spatial.transform import Rotation
 
-from saurongaze.common import Camera, Face
+from . import Camera, Face
 
 
 @dataclasses.dataclass(frozen=True)
