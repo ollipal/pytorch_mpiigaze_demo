@@ -1,5 +1,8 @@
 import logging
+from pathlib import Path
 import numpy as np
+from torch.cuda import is_available as cuda_available
+from types import SimpleNamespace
 from .ptgaze.common import (Camera, Eye, Face, FaceParts, FacePartsName, MODEL3D,
                      Visualizer)
 from .ptgaze.config import get_default_config
@@ -10,44 +13,93 @@ from .ptgaze.transforms import create_transform
 from .ptgaze.gaze_estimator import GazeEstimator
 from .ptgaze.utils import update_config, update_default_config, update_config
 
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-class SauronGaze:
-    def __init__(self):
-        args = { # nothing
-            "camera": None,
-            "config": None,
-            "debug": False,
-            "device": None,
-            "ext": None,
-            "face_detector": 'dlib',
-            "image": None,
-            "mode": 'eye',
-            "no_screen": False,
-            "output_dir": None,
-            "video": None,
-            "face_detector":  None,
-        }
 
-        config = get_default_config()
-        #print(config)
-        update_default_config(config, args)
-        config.gaze_estimator.camera_params = "/home/olli/Documents/Personal/pytorch_mpiigaze_demo/saurongaze/ptgaze/data/calib/sample_params.yaml"
-        config.gaze_estimator.normalized_camera_params = "/home/olli/Documents/Personal/pytorch_mpiigaze_demo/saurongaze/ptgaze/data/calib/normalized_camera_params_eye.yaml"
-        config.face_detector.dlib.model = "/home/olli/.saurongaze/dlib/shape_predictor_68_face_landmarks.dat"
-        #print(config)
-        
-        self._config = config
-        self._gaze_estimator = GazeEstimator(config)
+class NestedNamespace(SimpleNamespace):
+    def __init__(self, dictionary, **kwargs):
+        super().__init__(**kwargs)
+        for key, value in dictionary.items():
+            if isinstance(value, dict):
+                self.__setattr__(key, NestedNamespace(value))
+            else:
+                self.__setattr__(key, value)
+
+    def __repr__(self):
+        items = []
+        for k, v in self.__dict__.items():
+            if isinstance(v, NestedNamespace):
+                items.append(f"{k}: {{\n" + "\n  ".join(("  " + v.__repr__()).split('\n')) + f"\n}},")
+            else:
+                items.append(f"{k}: {v!r},")
+        return "{}".format("\n".join(items))
+
+
+class SauronGaze:
+    def __init__(self, config=None): 
+        # TODO utils.py download scripts
+        self._config = config if config else self.get_default_config()
+        self._gaze_estimator = GazeEstimator(self._config)
         self._visualizer = Visualizer(self._gaze_estimator.camera)
         self._faces = []
         self._gazes = []
 
-    def refresh(self, frame, all_faces=True, copy_frame=True):
-        # all_faces=False will only calculate middle face
-        # TODO
-        # copy_frame=True
+    @staticmethod
+    def get_default_config(cuda=False):
+        if cuda and not cuda_available():
+            raise RuntimeError("CUDA not available")
+
+        saurongaze_path = Path(__file__).resolve().parent
+
+        return NestedNamespace({
+            "demo": {
+                "display_on_screen": True,
+                "gaze_visualization_length": 0.05,
+                "head_pose_axis_length": 0.05,
+                "image_path": None,
+                "output_dir": None,
+                "output_file_extension": "avi",
+                "show_bbox": True,
+                "show_head_pose": False,
+                "show_landmarks": False,
+                "show_normalized_image": False,
+                "show_template_model": False,
+                "use_camera": True,
+                "video_path": None,
+                "wait_time": 1,
+            },
+            "device": "cuda" if cuda else "cpu",
+            "face_detector": {
+                "dlib": {
+                    "model": "/home/olli/.saurongaze/dlib/shape_predictor_68_face_landmarks.dat" # TODO different way
+                }, 
+                "mode": "dlib",
+            },
+            "gaze_estimator": {
+                "camera_params": f"{saurongaze_path}/ptgaze/data/calib/sample_params.yaml",
+                "checkpoint": f"/home/olli/.saurongaze/models/mpiigaze_resnet_preact.pth", # TODO different way
+                "normalized_camera_distance": 0.6,
+                "normalized_camera_params": f"{saurongaze_path}/ptgaze/data/calib/normalized_camera_params_eye.yaml",
+            },
+            "mode": "MPIIGaze",
+            "model": {
+                "backbone": {
+                    "name": "resnet_simple",
+                    "pretrained": "resnet18",
+                    "resnet_block": "basic",
+                    "resnet_layers": [2, 2, 2],
+                },
+                "name": "resnet_preact",
+            },
+            "transform": {
+                "mpiifacegaze_face_size": 224,
+                "mpiifacegaze_gray": False,
+            },
+        })
+
+    def refresh(self, frame, copy_frame=False):
         if copy_frame:
             self._visualizer.set_image(frame.copy())
         else:
@@ -56,7 +108,7 @@ class SauronGaze:
         for face in self._faces:
             self._gaze_estimator.estimate_gaze(frame, face)
 
-    def draw(self):
+    def get_frame(self):
         for face in self._faces:
             self._draw_gaze_vector(face)
         return self._visualizer.image

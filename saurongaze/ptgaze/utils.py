@@ -218,16 +218,16 @@ def _check_path_all(config: yacs.config.CfgNode) -> None:
 def update_default_config(config: yacs.config.CfgNode,
                           args: argparse.Namespace) -> None:
     logger.debug('Called update_default_config()')
-    if not args["mode"]:
+    if not args.mode:
         logger.debug('--mode is not specified.')
         raise ValueError
     else:
-        logger.debug(f'--mode is {args["mode"]}')
-        if args["mode"] == 'eye':
+        logger.debug(f'--mode is {args.mode}')
+        if args.mode == 'eye':
             config.mode = 'MPIIGaze'
             model_path = _download_eye_model()
             config.gaze_estimator.checkpoint = model_path.as_posix()
-        elif args["mode"] == 'face':
+        elif args.mode == 'face':
             config.mode = 'MPIIFaceGaze'
             config.model.name = 'resnet_simple'
             model_path = _download_face_model()
@@ -235,42 +235,42 @@ def update_default_config(config: yacs.config.CfgNode,
         else:
             raise ValueError
         logger.debug('Set config.gaze_estimator.checkpoint')
-    if args["face_detector"]:
-        config.face_detector.mode = args["face_detector"]
-    if args["device"]:
-        logger.debug(f'--device is {args["device"]}')
-        config.device = args["device"]
+    if args.face_detector:
+        config.face_detector.mode = args.face_detector
+    if args.device:
+        logger.debug(f'--device is {args.device}')
+        config.device = args.device
         logger.debug(f'Update config.device to {config.device}')
     if config.device == 'cuda' and not torch.cuda.is_available():
         logger.debug('CUDA is not available.')
         config.device = 'cpu'
         logger.debug(f'Update config.device to cpu')
         warnings.warn('Run on CPU because CUDA is not available.')
-    if args["image"] and args["video"]:
+    if args.image and args.video:
         raise ValueError('Only one of --image or --video can be specified.')
-    if args["image"]:
-        logger.debug(f'--image is {args["image"]}')
-        config.demo.image_path = args["image"]
+    if args.image:
+        logger.debug(f'--image is {args.image}')
+        config.demo.image_path = args.image
         config.demo.use_camera = False
         logger.debug(
             f'Update config.demo.image_path to {config.demo.image_path}')
         logger.debug('Set config.demo.use_camera False')
-    if args["video"]:
-        logger.debug(f'--video is {args["video"]}')
-        config.demo.video_path = args["video"]
+    if args.video:
+        logger.debug(f'--video is {args.video}')
+        config.demo.video_path = args.video
         config.demo.use_camera = False
         logger.debug(
             f'Update config.demo.video_path to {config.demo.video_path}')
         logger.debug('Set config.demo.use_camera False')
-    if args["output_dir"]:
-        logger.debug(f'--output-dir is {args["output_dir"]}')
-        config.demo.output_dir = args["output_dir"]
+    if args.output_dir:
+        logger.debug(f'--output-dir is {args.output_dir}')
+        config.demo.output_dir = args.output_dir
         logger.debug(f'Update config.demo.output_dir')
-    if args["ext"]:
-        logger.debug(f'--ext is {args["ext"]}')
-        config.demo.output_file_extension = args["ext"]
+    if args.ext:
+        logger.debug(f'--ext is {args.ext}')
+        config.demo.output_file_extension = args.ext
         logger.debug('Update config.demo.ouput_file_extension')
-    if args["no_screen"]:
+    if args.no_screen:
         logger.debug(f'--no-screen is set')
         config.demo.display_on_screen = False
         logger.debug('Set config.demo.display_on_screen False')
