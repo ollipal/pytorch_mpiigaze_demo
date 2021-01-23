@@ -52,6 +52,14 @@ class SauronGaze:
 
         saurongaze_path = Path(__file__).resolve().parent
 
+        dlib_model_dir = Path('~/.saurongaze/dlib/').expanduser()
+        dlib_model_dir.mkdir(exist_ok=True, parents=True)
+        dlib_model_path = dlib_model_dir / 'shape_predictor_68_face_landmarks.dat'
+
+        model_dir = Path('~/.saurongaze/models/').expanduser()
+        model_dir.mkdir(exist_ok=True, parents=True)
+        model_path = model_dir / 'mpiigaze_resnet_preact.pth'    
+
         return NestedNamespace({
             "demo": {
                 "display_on_screen": True,
@@ -72,15 +80,15 @@ class SauronGaze:
             "device": "cuda" if cuda else "cpu",
             "face_detector": {
                 "dlib": {
-                    "model": "/home/olli/.saurongaze/dlib/shape_predictor_68_face_landmarks.dat" # TODO different way
+                    "model": str(dlib_model_path),
                 }, 
                 "mode": "dlib",
             },
             "gaze_estimator": {
-                "camera_params": f"{saurongaze_path}/ptgaze/data/calib/sample_params.yaml",
-                "checkpoint": f"/home/olli/.saurongaze/models/mpiigaze_resnet_preact.pth", # TODO different way
+                "camera_params": str(saurongaze_path / "ptgaze" / "data" / "calib" / "sample_params.yaml"),
+                "checkpoint": str(model_path),
                 "normalized_camera_distance": 0.6,
-                "normalized_camera_params": f"{saurongaze_path}/ptgaze/data/calib/normalized_camera_params_eye.yaml",
+                "normalized_camera_params": str(saurongaze_path / "ptgaze" / "data" / "calib" / "normalized_camera_params_eye.yaml"),
             },
             "mode": "MPIIGaze",
             "model": {
