@@ -13,7 +13,10 @@ if __name__ == "__main__" :
             print("no frame returned")
             break
 
-        sgaze.refresh(frame)
+        head, gaze = sgaze.refresh(frame)
+        print(f"Head:\n{head}\n")
+        print(f"Gaze:\n{gaze}\n")
+
         drawn_frame = sgaze.get_frame()
 
         cv2.imshow("saurongaze", drawn_frame)

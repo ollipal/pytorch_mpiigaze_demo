@@ -44,7 +44,6 @@ class SauronGaze:
         self._gaze_estimator = GazeEstimator(self._config)
         self._visualizer = Visualizer(self._gaze_estimator.camera)
         self._faces = []
-        self._gazes = []
 
     @staticmethod
     def get_default_config(cuda=False):
@@ -105,30 +104,46 @@ class SauronGaze:
         else:
             self._visualizer.set_image(frame)
         self._faces = self._gaze_estimator.detect_faces(frame)
-        for face in self._faces:
-            self._gaze_estimator.estimate_gaze(frame, face)
 
-    def get_frame(self):
-        for face in self._faces:
-            self._draw_gaze_vector(face)
-            self._draw_head_pose(face)
+        if len(self._faces) > 0:
+            # TODO select the middle face only
+            self._gaze_estimator.estimate_gaze(frame, self._faces[0])
+            
+            euler_angles = self._faces[0].head_pose_rot.as_euler('XYZ', degrees=True)
+            head_pitch, head_yaw, head_roll = self._faces[0].change_coordinate_system(euler_angles)
+            head = NestedNamespace({
+                "pitch": head_pitch,
+                "yaw": head_yaw,
+                "roll": head_roll,
+                "distance": self._faces[0].distance,
+            })
+
+            right_eye = getattr(self._faces[0], FacePartsName.REYE.name.lower())
+            left_eye = getattr(self._faces[0], FacePartsName.LEYE.name.lower())
+            right_eye_pitch, right_eye_yaw = np.rad2deg(right_eye.vector_to_angle(right_eye.gaze_vector))
+            left_eye_pitch, left_eye_yaw = np.rad2deg(left_eye.vector_to_angle(left_eye.gaze_vector))
+            gaze = NestedNamespace({
+                "right": {
+                    "pitch": right_eye_pitch,
+                    "yaw": right_eye_yaw,
+                },
+                "left": {
+                    "pitch": left_eye_pitch,
+                    "yaw": left_eye_yaw,
+                },
+            })
+
+            return head, gaze
+        else:
+            return None, None
+
+    def get_frame(self, head=True, gaze=True):
+        if len(self._faces) > 0:
+            if head:
+                self._draw_head_pose(self._faces[0])
+            if gaze:
+                self._draw_gaze_vector(self._faces[0])
         return self._visualizer.image
-
-    @property
-    def faces(self):
-        return self._faces
-
-    @faces.setter
-    def faces(self, faces):
-        self._faces = faces
-
-    @property
-    def gazes(self):
-        return self._gazes
-
-    @gazes.setter
-    def gazes(self, gazes):
-        self._gazes = gazes
 
     def _draw_gaze_vector(self, face: Face) -> None:
         length = self._config.demo.gaze_visualization_length
@@ -137,14 +152,14 @@ class SauronGaze:
                 eye = getattr(face, key.name.lower())
                 self._visualizer.draw_3d_line(
                     eye.center, eye.center + length * eye.gaze_vector)
-                pitch, yaw = np.rad2deg(eye.vector_to_angle(eye.gaze_vector))
-                logger.info(
-                    f'[{key.name.lower()}] pitch: {pitch:.2f}, Yaw: {yaw:.2f}')
         elif self._config.mode == GazeEstimationMethod.MPIIFaceGaze.name:
+            raise RuntimeError("MPIIFaceGaze not supported")
+            """
             self._visualizer.draw_3d_line(
                 face.center, face.center + length * face.gaze_vector)
             pitch, yaw = np.rad2deg(face.vector_to_angle(face.gaze_vector))
             logger.info(f'[face] pitch: {pitch:.2f}, yaw: {yaw:.2f}')
+            """
         else:
             raise ValueError
 
@@ -154,8 +169,3 @@ class SauronGaze:
         # Draw the axes of the model coordinate system
         length = self._config.demo.head_pose_axis_length
         self._visualizer.draw_model_axes(face, length, lw=2)
-
-        euler_angles = face.head_pose_rot.as_euler('XYZ', degrees=True)
-        pitch, yaw, roll = face.change_coordinate_system(euler_angles)
-        logger.info(f'[head] pitch: {pitch:.2f}, yaw: {yaw:.2f}, '
-                    f'roll: {roll:.2f}, distance: {face.distance:.2f}')
