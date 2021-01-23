@@ -62,7 +62,7 @@ class SauronGaze:
                 "output_dir": None,
                 "output_file_extension": "avi",
                 "show_bbox": True,
-                "show_head_pose": False,
+                "show_head_pose": True,
                 "show_landmarks": False,
                 "show_normalized_image": False,
                 "show_template_model": False,
@@ -111,6 +111,7 @@ class SauronGaze:
     def get_frame(self):
         for face in self._faces:
             self._draw_gaze_vector(face)
+            self._draw_head_pose(face)
         return self._visualizer.image
 
     @property
@@ -146,3 +147,15 @@ class SauronGaze:
             logger.info(f'[face] pitch: {pitch:.2f}, yaw: {yaw:.2f}')
         else:
             raise ValueError
+
+    def _draw_head_pose(self, face: Face) -> None:
+        if not self._config.demo.show_head_pose:
+            return
+        # Draw the axes of the model coordinate system
+        length = self._config.demo.head_pose_axis_length
+        self._visualizer.draw_model_axes(face, length, lw=2)
+
+        euler_angles = face.head_pose_rot.as_euler('XYZ', degrees=True)
+        pitch, yaw, roll = face.change_coordinate_system(euler_angles)
+        logger.info(f'[head] pitch: {pitch:.2f}, yaw: {yaw:.2f}, '
+                    f'roll: {roll:.2f}, distance: {face.distance:.2f}')

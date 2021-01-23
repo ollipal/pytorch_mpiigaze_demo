@@ -1,6 +1,7 @@
 import cv2
 from saurongaze import SauronGaze
 
+
 if __name__ == "__main__" :
     cap = cv2.VideoCapture(0)
     sgaze = SauronGaze()
