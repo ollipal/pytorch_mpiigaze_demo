@@ -145,11 +145,11 @@ class SauronGaze:
         else:
             return None, None
 
-    def get_frame(self, head=True, gaze=True):
+    def get_drawn_frame(self, draw_head=True, draw_gaze=True):
         if len(self._faces) > 0:
-            if head:
+            if draw_head:
                 self._draw_head_pose(self._faces[0])
-            if gaze:
+            if draw_gaze:
                 self._draw_gaze_vector(self._faces[0])
         return self._visualizer.image
 
